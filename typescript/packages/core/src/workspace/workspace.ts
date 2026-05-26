@@ -29,6 +29,7 @@ import type { Resource } from '../resource/base.ts'
 import { RAMResource, type RAMResourceState } from '../resource/ram/ram.ts'
 import { resourceStateRequiresOverride } from '../resource/secrets.ts'
 import { GENERAL_COMMANDS, HISTORY_COMMANDS } from '../commands/builtin/general/index.ts'
+import { applySafeguard } from '../commands/builtin/utils/safeguard.ts'
 import { applyBarrier, BarrierPolicy } from '../shell/barrier.ts'
 import { JobTable } from '../shell/job_table.ts'
 import { findSyntaxError, type ShellParser } from '../shell/parse.ts'
@@ -836,8 +837,23 @@ export class Workspace {
         executeNode(deps, rootNode, effectiveSession, stdin, null),
       ),
     )
-    const materialized = await applyBarrier(stdout, io, BarrierPolicy.VALUE)
+    let materialized = await applyBarrier(stdout, io, BarrierPolicy.VALUE)
     io.syncExitCode()
+    if (io.safeguard !== null && materialized !== null) {
+      const [trimmed, sgIo] = await applySafeguard(materialized, io.safeguard)
+      materialized = trimmed
+      if (sgIo.stderr !== null) {
+        const existing = await materialize(io.stderr)
+        const added = await materialize(sgIo.stderr)
+        const merged = new Uint8Array(existing.byteLength + added.byteLength)
+        merged.set(existing, 0)
+        merged.set(added, existing.byteLength)
+        io.stderr = merged
+      }
+      if (sgIo.exitCode !== 0) {
+        io.exitCode = sgIo.exitCode
+      }
+    }
     targetSession.lastExitCode = io.exitCode
     await applyIo(this.cache, io)
     const stdoutBytes = materialized === null ? new Uint8Array() : await materialize(materialized)

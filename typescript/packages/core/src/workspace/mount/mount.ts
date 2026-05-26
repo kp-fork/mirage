@@ -24,13 +24,14 @@ import type { OpKwargs } from '../../ops/registry.ts'
 
 const NOOP_ACCESSOR = new NOOPAccessor()
 import { getExtension } from '../../commands/resolve.ts'
+import { resolveSafeguard } from '../../commands/safeguard.ts'
 import type { CommandSpec } from '../../commands/spec/types.ts'
 import type { ByteSource } from '../../io/types.ts'
 import { IOResult } from '../../io/types.ts'
 import { runWithRevisions, setVirtualPrefix } from '../../observe/context.ts'
 import type { RegisteredOp } from '../../ops/registry.ts'
 import type { Resource } from '../../resource/base.ts'
-import { ConsistencyPolicy, MountMode, PathSpec } from '../../types.ts'
+import { type CommandSafeguard, ConsistencyPolicy, MountMode, PathSpec } from '../../types.ts'
 import type { PyodideRuntime } from '../executor/python/runtime.ts'
 
 type CmdKey = string
@@ -77,6 +78,7 @@ export class Mount {
   private readonly cmds = new Map<CmdKey, RegisteredCommand>()
   private readonly generalCmds = new Map<string, RegisteredCommand>()
   private readonly cmdSpecs = new Map<string, CommandSpec>()
+  readonly commandSafeguards = new Map<string, CommandSafeguard>()
   private readonly ops = new Map<OpKey, RegisteredOp>()
   private readonly generalOps = new Map<string, RegisteredOp>()
   private readonly crossCmds = new Map<string, RegisteredCommand>()
@@ -391,6 +393,13 @@ export class Mount {
             }
             const result = await cmd.fn(accessor, expandedPaths, texts, cmdOpts)
             if (result !== null) {
+              // TODO: hand back a finalization context separately
+              // instead of stamping policy onto io.safeguard.
+              result[1].safeguard = resolveSafeguard(
+                cmdName,
+                cmd.safeguard,
+                this.commandSafeguards.get(cmdName) ?? null,
+              )
               return result
             }
           }
