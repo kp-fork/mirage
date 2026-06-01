@@ -12,8 +12,18 @@
 # limitations under the License.
 # ========= Copyright 2026 @ Strukto.AI All Rights Reserved. =========
 
-from mirage.workspace.node.execute_node import execute_node
-from mirage.workspace.node.provision_node import provision_node
-from mirage.workspace.node.run_tree import run_command_tree
+from mirage.types import PathSpec
 
-__all__ = ["execute_node", "provision_node", "run_command_tree"]
+
+def _to_scope(path: str) -> PathSpec:
+    """Wrap a resolved path string as PathSpec."""
+    last_slash = path.rfind("/")
+    directory = path[:last_slash + 1] if last_slash >= 0 else "/"
+    return PathSpec(original=path, directory=directory, resolved=True)
+
+
+def _scope_path(val) -> str:
+    """Extract path string from str or PathSpec."""
+    if isinstance(val, PathSpec):
+        return val.original
+    return val

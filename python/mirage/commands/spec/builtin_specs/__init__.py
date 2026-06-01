@@ -12,8 +12,17 @@
 # limitations under the License.
 # ========= Copyright 2026 @ Strukto.AI All Rights Reserved. =========
 
-from mirage.workspace.node.execute_node import execute_node
-from mirage.workspace.node.provision_node import provision_node
-from mirage.workspace.node.run_tree import run_command_tree
+from mirage.commands.spec.builtin_specs import (archive, fs_mutate, hashing,
+                                                listing, net, runtime, search,
+                                                text_proc, viewing)
+from mirage.commands.spec.types import CommandSpec
 
-__all__ = ["execute_node", "provision_node", "run_command_tree"]
+_MODULES = (archive, fs_mutate, hashing, listing, net, runtime, search,
+            text_proc, viewing)
+
+SPECS: dict[str, CommandSpec] = {}
+for _module in _MODULES:
+    for _name in _module.SPECS:
+        if _name in SPECS:
+            raise ValueError(f"duplicate command spec: {_name}")
+    SPECS.update(_module.SPECS)
