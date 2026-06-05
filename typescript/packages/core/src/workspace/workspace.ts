@@ -69,6 +69,7 @@ import type { PythonReplRunResult } from './executor/python/types.ts'
 import { makeAbortError } from './abort.ts'
 import { executeNode } from './node/execute_node.ts'
 import { provisionNode } from './node/provision_node.ts'
+import { buildFilePrompt } from './file_prompt.ts'
 import { SessionManager } from './session/manager.ts'
 import type { Session } from './session/session.ts'
 import { ExecutionHistory } from './history.ts'
@@ -222,9 +223,6 @@ export interface ExecuteOptions {
    */
   env?: Record<string, string>
 }
-
-const HELP_HINT =
-  'Tip: run `man` to list every available command grouped by resource, `man <cmd>` for a single entry, and `<cmd> --help` for flag details.'
 
 export class Workspace {
   readonly registry: MountRegistry
@@ -523,19 +521,7 @@ export class Workspace {
   }
 
   get filePrompt(): string {
-    const parts: string[] = [HELP_HINT]
-    for (const m of this.registry.allMounts()) {
-      const r = m.resource as { prompt?: string; writePrompt?: string }
-      const prompt = r.prompt
-      if (prompt === undefined || prompt === '') continue
-      const prefix = m.prefix.replace(/\/+$/, '') || '/'
-      let section = prompt.replace(/\{prefix\}/g, prefix)
-      if (m.mode !== MountMode.READ && r.writePrompt !== undefined && r.writePrompt !== '') {
-        section += '\n' + r.writePrompt.replace(/\{prefix\}/g, prefix)
-      }
-      parts.push(section)
-    }
-    return parts.join('\n\n')
+    return buildFilePrompt(this.registry.allMounts())
   }
 
   /**
