@@ -6,6 +6,12 @@ from mirage.io.types import ByteSource, IOResult
 from mirage.types import PathSpec
 
 
+def _parse_count(value: str | None) -> int:
+    if value is None:
+        return 0
+    return int(value)
+
+
 def _comparison_key(
     line: bytes,
     skip_fields: int,
@@ -82,10 +88,10 @@ async def uniq(
     count: bool = False,
     duplicates_only: bool = False,
     unique_only: bool = False,
-    skip_fields: int = 0,
-    skip_chars: int = 0,
+    skip_fields: str | None = None,
+    skip_chars: str | None = None,
     ignore_case: bool = False,
-    check_chars: int = 0,
+    check_chars: str | None = None,
 ) -> tuple[ByteSource | None, IOResult]:
     cache: list[str] = []
     if paths:
@@ -99,10 +105,10 @@ async def uniq(
         count=count,
         duplicates_only=duplicates_only,
         unique_only=unique_only,
-        skip_fields=skip_fields,
-        skip_chars=skip_chars,
+        skip_fields=_parse_count(skip_fields),
+        skip_chars=_parse_count(skip_chars),
         ignore_case=ignore_case,
-        check_chars=check_chars,
+        check_chars=_parse_count(check_chars),
     ), IOResult(cache=cache)
 
 
