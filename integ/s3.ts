@@ -91,6 +91,13 @@ const CROSS_CASES: ReadonlyArray<readonly [string, string]> = [
   ["concat_wc", `cat /s3/data/example.jsonl /gcs/data/example.jsonl | wc -l`],
 ];
 
+const STREAMING_CASES: ReadonlyArray<readonly [string, string]> = [
+  ["head_c100", `head -c 100 {m}/data/example.jsonl`],
+  ["head_n1", `head -n 1 {m}/data/example.jsonl`],
+  ["grep_m1", `grep -m 1 mirage {m}/data/example.jsonl`],
+  ["cat_wc_full", `cat {m}/data/example.jsonl | wc -l`],
+];
+
 const EXIT_CODE_CASES: ReadonlyArray<readonly [string, string]> = [
   ["grep_match", `grep -q mirage {m}/data/example.jsonl`],
   ["grep_no_match", `grep -q zzzznomatch {m}/data/example.jsonl`],
@@ -197,6 +204,37 @@ async function runExit(
   if (err) process.stdout.write(err.endsWith("\n") ? err : err + "\n");
 }
 
+function pyRepr(s: string): string {
+  const quote = s.includes("'") && !s.includes('"') ? '"' : "'";
+  let body = s
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+  body =
+    quote === "'" ? body.replace(/'/g, "\\'") : body.replace(/"/g, '\\"');
+  return quote + body + quote;
+}
+
+async function measureBytes(
+  ws: Workspace,
+  name: string,
+  cmd: string,
+): Promise<void> {
+  await ws.cache.clear();
+  const before = ws.records.reduce((sum, r) => sum + r.bytes, 0);
+  const result = await ws.execute(cmd);
+  const out = DEC.decode(result.stdout);
+  const net = ws.records.reduce((sum, r) => sum + r.bytes, 0) - before;
+  const trimmed = out.trim();
+  const lines = trimmed === "" ? [] : trimmed.split("\n");
+  const first = lines.length > 0 ? (lines[0] ?? "").slice(0, 48) : "";
+  process.stdout.write(`=== ${name} ===\n`);
+  process.stdout.write(
+    `bytes=${net} lines=${lines.length} out0=${pyRepr(first)}\n`,
+  );
+}
+
 async function measureCalls(name: string, cmd: string): Promise<void> {
   const ws = buildWorkspace();
   resetCalls();
@@ -223,6 +261,15 @@ async function main(): Promise<void> {
         await run(ws, `${tag}:${name}`, tmpl.replaceAll("{m}", mount));
     }
     for (const [name, cmd] of CROSS_CASES) await run(ws, `cross:${name}`, cmd);
+    for (const mount of MOUNTS) {
+      const tag = mount.slice(1);
+      for (const [name, tmpl] of STREAMING_CASES)
+        await measureBytes(
+          ws,
+          `${tag}:stream:${name}`,
+          tmpl.replaceAll("{m}", mount),
+        );
+    }
     for (const mount of MOUNTS) {
       const tag = mount.slice(1);
       for (const [name, tmpl] of INDEX_CASES)

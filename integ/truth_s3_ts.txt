@@ -312,6 +312,30 @@ output truncated at safeguard limit (20 lines); narrow with grep, or read more w
 5678
 === cross:concat_wc ===
 11532
+=== s3:stream:head_c100 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== s3:stream:head_n1 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== s3:stream:grep_m1 ===
+bytes=8192 lines=1 out0='{"parentUuid":null,"isSidechain":false,"userType'
+=== s3:stream:cat_wc_full ===
+bytes=10414430 lines=1 out0='5766'
+=== gcs:stream:head_c100 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== gcs:stream:head_n1 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== gcs:stream:grep_m1 ===
+bytes=8192 lines=1 out0='{"parentUuid":null,"isSidechain":false,"userType'
+=== gcs:stream:cat_wc_full ===
+bytes=10414430 lines=1 out0='5766'
+=== minio:stream:head_c100 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== minio:stream:head_n1 ===
+bytes=8192 lines=1 out0='{"type":"queue-operation","operation":"enqueue",'
+=== minio:stream:grep_m1 ===
+bytes=8192 lines=1 out0='{"parentUuid":null,"isSidechain":false,"userType'
+=== minio:stream:cat_wc_full ===
+bytes=10414430 lines=1 out0='5766'
 === s3:calls:ls_l ===
 ListObjectsV2=1 HeadObject=0
 === s3:calls:tree ===
