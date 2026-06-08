@@ -5,9 +5,9 @@ description: Set up the LanceDB resource in Python, including LanceDB OSS, objec
 ---
 
 The LanceDB resource mounts a LanceDB table as a filesystem: group-by columns
-become folders, rows become files, and semantic search is a virtual `_search`
-folder. See [LanceDB Resource](/python/resource/lancedb) for the full layout
-and command list.
+become folders, rows become files, and semantic search is the `search` command.
+See [LanceDB Resource](/python/resource/lancedb) for the full layout and command
+list.
 
 ## Dependencies
 
@@ -109,8 +109,8 @@ for local and object-storage mounts.
 ## Search setup
 
 Search is powered by the table's own embedding function, not by Mirage. The
-mount only enables the `_search` folder when `vector_column` is set; the table
-must have been created with an embedding function registered on a source field.
+`search` command is available when `vector_column` is set; the table must have
+been created with an embedding function registered on a source field.
 
 A minimal CLIP-backed table (run once in your builder environment):
 
@@ -135,12 +135,13 @@ table = db.create_table("fashion", schema=Product)
 table.add(rows)  # rows include image_bytes
 ```
 
-Once mounted, querying is a path read. LanceDB embeds the query text with the
-same model and runs vector search:
+Once mounted, querying is the `search` command. LanceDB embeds the query text
+with the same model and runs vector search, returning ranked rows as canonical
+file paths with a score, then their cards:
 
 ```bash
-ls "/fashion/_search/red running shoes"     # top matches as <id>.md / <id>.jpg
-cat "/fashion/_search/red running shoes/3.md"   # card with a similarity score
+search "red running shoes" /fashion          # ranked <path>.md:score + card body
+cat /fashion/Men/Shoes/White/3.md             # follow a result to the real file
 ```
 
 A runnable, dependency-free version (a lightweight keyword embedding instead of
@@ -161,9 +162,8 @@ CLIP) lives in `examples/python/lancedb/`.
 | `title_column`   | No       |               | Column used as the card heading                                   |
 | `blob_column`    | No       |               | Column served as the raw blob/image file                         |
 | `blob_ext`       | No       | `bin`         | Extension for the blob file (`jpg`, `png`, ...)                   |
-| `vector_column`  | No       |               | Vector column; presence enables `_search`                        |
-| `search_dir`     | No       | `_search`     | Name of the virtual search folder                                |
-| `search_limit`   | No       | `10`          | Top-k returned by a search query                                 |
+| `vector_column`  | No       |               | Vector column; presence enables the `search` command            |
+| `search_limit`   | No       | `10`          | Default top-k returned by `search`                              |
 | `max_rows`       | No       | `1000`        | Cap on rows scanned per folder listing                           |
 
 The mount is read-only. See [LanceDB Resource](/python/resource/lancedb) for the

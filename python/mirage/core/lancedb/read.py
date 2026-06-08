@@ -16,20 +16,13 @@ import base64
 
 from mirage.accessor.lancedb import LanceDBAccessor
 from mirage.cache.index import IndexCacheStore
-from mirage.core.lancedb.query import row_record, search_rows
+from mirage.core.lancedb.query import row_record
 from mirage.core.lancedb.render import render_card
 from mirage.core.lancedb.scope import ScopeLevel, detect_scope
 from mirage.types import PathSpec
 
 
 async def _resolve_row(accessor: LanceDBAccessor, scope, config) -> dict:
-    if scope.query is not None:
-        rows = await search_rows(accessor, scope.table, scope.query,
-                                 config.search_limit)
-        for row in rows:
-            if str(row.get(config.id_column)) == str(scope.row_id):
-                return row
-        raise FileNotFoundError(scope.resource_path)
     row = await row_record(accessor, scope.table, config.id_column,
                            scope.row_id)
     if row is None:

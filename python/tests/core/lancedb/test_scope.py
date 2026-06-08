@@ -72,24 +72,6 @@ def test_row_blob():
     assert s.blob is True
 
 
-def test_search_dir():
-    s = detect_scope(_ps("/animals/_search"), _cfg())
-    assert s.level == ScopeLevel.SEARCH_DIR
-
-
-def test_search_results():
-    s = detect_scope(_ps("/animals/_search/black cat"), _cfg())
-    assert s.level == ScopeLevel.SEARCH_RESULTS
-    assert s.query == "black cat"
-
-
-def test_search_row():
-    s = detect_scope(_ps("/animals/_search/black cat/3.md"), _cfg())
-    assert s.level == ScopeLevel.ROW
-    assert s.query == "black cat"
-    assert s.row_id == "3"
-
-
 def test_single_table_pin_elides_table():
     s = detect_scope(_ps("/cat/big"), _cfg(table="animals"))
     assert s.level == ScopeLevel.GROUP_DIR

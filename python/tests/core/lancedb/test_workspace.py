@@ -36,9 +36,10 @@ async def test_ls_root_lists_table(ws):
 
 
 @pytest.mark.asyncio
-async def test_ls_table_lists_groups_and_search(ws):
+async def test_ls_table_lists_groups(ws):
     out = await _out(ws, "ls /db/animals")
-    assert "cat" in out and "dog" in out and "_search" in out
+    assert "cat" in out and "dog" in out
+    assert "_search" not in out
 
 
 @pytest.mark.asyncio
@@ -55,11 +56,20 @@ async def test_tree_shows_hierarchy(ws):
 
 
 @pytest.mark.asyncio
-async def test_search_lists_and_scores(ws):
-    listing = await _out(ws, 'ls "/db/animals/_search/a small white dog"')
-    assert "4.md" in listing
-    card = await _out(ws, 'cat "/db/animals/_search/a small white dog/4.md"')
-    assert "score:" in card
+async def test_search_returns_canonical_path_and_card(ws):
+    out = await _out(ws, 'search "a small white dog" /db/animals')
+    assert "/db/animals/dog/small/4.md" in out
+    assert "# a small white dog" in out
+    assert "score:" not in out
+
+
+@pytest.mark.asyncio
+async def test_search_result_path_is_readable(ws):
+    out = await _out(ws, 'search "a small white dog" /db/animals')
+    line = out.splitlines()[0]
+    path = line.split(":", 1)[0]
+    card = await _out(ws, f"cat {path}")
+    assert "# a small white dog" in card
 
 
 @pytest.mark.asyncio

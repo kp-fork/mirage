@@ -33,9 +33,9 @@ async def test_root_lists_table(accessor):
 
 
 @pytest.mark.asyncio
-async def test_table_lists_groups_and_search(accessor):
+async def test_table_lists_groups(accessor):
     out = await readdir(accessor, _ps("/animals"))
-    assert _names(out) == {"cat", "dog", "_search"}
+    assert _names(out) == {"cat", "dog"}
 
 
 @pytest.mark.asyncio
@@ -48,15 +48,3 @@ async def test_group_lists_next_level(accessor):
 async def test_leaf_lists_row_files(accessor):
     out = await readdir(accessor, _ps("/animals/cat/big"))
     assert _names(out) == {"1.md", "1.png"}
-
-
-@pytest.mark.asyncio
-async def test_search_dir_is_empty(accessor):
-    out = await readdir(accessor, _ps("/animals/_search"))
-    assert out == []
-
-
-@pytest.mark.asyncio
-async def test_search_results_rank_rows(accessor):
-    out = await readdir(accessor, _ps("/animals/_search/a small white dog"))
-    assert "4.md" in _names(out)

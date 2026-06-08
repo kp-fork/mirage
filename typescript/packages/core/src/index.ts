@@ -1038,6 +1038,7 @@ export { read as lanceRead } from './core/lancedb/read.ts'
 export { readdir as lanceReaddir } from './core/lancedb/readdir.ts'
 export { stat as lanceStat } from './core/lancedb/stat.ts'
 export { resolveGlob as resolveLanceGlob } from './core/lancedb/glob.ts'
+export { searchRowsOutput as lanceSearch } from './core/lancedb/search.ts'
 export {
   detectScope as detectLanceScope,
   ScopeLevel as LanceScopeLevel,

@@ -43,7 +43,6 @@ export async function readdir(
   const config = accessor.config
   const scope = detectScope(spec, config)
   const base = spec.original.replace(/\/+$/, '')
-  const searchable = config.vectorColumn !== null
 
   if (scope.level === ScopeLevel.ROOT) {
     const tables = await accessor.driver.listTables()
@@ -70,17 +69,7 @@ export async function readdir(
       )
       names = rowFiles(rows, config)
     }
-    if (depth === 0 && searchable) names = [...names, config.searchDir]
     return names.map((name) => `${base}/${name}`)
-  }
-
-  if (scope.level === ScopeLevel.SEARCH_DIR) {
-    return []
-  }
-
-  if (scope.level === ScopeLevel.SEARCH_RESULTS && scope.table !== null && scope.query !== null) {
-    const rows = await accessor.searchRows(scope.table, scope.query, config.searchLimit)
-    return rowFiles(rows, config).map((name) => `${base}/${name}`)
   }
 
   throw notFound(spec.original)

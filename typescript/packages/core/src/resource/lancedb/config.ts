@@ -26,7 +26,6 @@ export interface LanceDBConfig {
   blobExt?: string
   textColumn?: string
   vectorColumn?: string
-  searchDir?: string
   searchLimit?: number
   maxRows?: number
 }
@@ -45,7 +44,6 @@ export interface LanceDBConfigResolved {
   blobExt: string
   textColumn: string | null
   vectorColumn: string | null
-  searchDir: string
   searchLimit: number
   maxRows: number
 }
@@ -65,7 +63,6 @@ export function resolveLanceDBConfig(config: LanceDBConfig): LanceDBConfigResolv
     blobExt: config.blobExt ?? 'bin',
     textColumn: config.textColumn ?? null,
     vectorColumn: config.vectorColumn ?? null,
-    searchDir: config.searchDir ?? '_search',
     searchLimit: config.searchLimit ?? 10,
     maxRows: config.maxRows ?? 1000,
   }

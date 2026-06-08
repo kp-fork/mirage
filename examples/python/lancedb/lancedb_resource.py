@@ -56,8 +56,7 @@ async def main() -> None:
     r = await ws.execute("stat -c '%s' /fashion/Men/Shoes/White/3.jpg")
     print(f"  image size: {(await r.stdout_str()).strip()} bytes")
 
-    await show(ws, 'ls "/fashion/_search/white running sneakers"')
-    await show(ws, 'cat "/fashion/_search/white running sneakers/3.md"')
+    await show(ws, 'search "white running sneakers" /fashion')
 
     await show(ws, "grep -ril blue /fashion/Women")
 

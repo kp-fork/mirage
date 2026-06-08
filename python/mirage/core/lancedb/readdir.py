@@ -15,7 +15,7 @@
 from mirage.accessor.lancedb import LanceDBAccessor
 from mirage.cache.index import IndexCacheStore
 from mirage.core.lancedb.query import (distinct_values, list_tables,
-                                       rows_matching, search_rows)
+                                       rows_matching)
 from mirage.core.lancedb.scope import ScopeLevel, detect_scope
 from mirage.types import PathSpec
 
@@ -40,7 +40,6 @@ async def readdir(
     config = accessor.config
     scope = detect_scope(path, config)
     base = path.original.rstrip("/")
-    searchable = config.vector_column is not None
 
     if scope.level == ScopeLevel.ROOT:
         names = await list_tables(accessor)
@@ -57,17 +56,6 @@ async def readdir(
             rows = await rows_matching(accessor, scope.table, scope.filters,
                                        [config.id_column], config.max_rows)
             names = _row_files(rows, config)
-        if depth == 0 and searchable:
-            names = names + [config.search_dir]
-        return [f"{base}/{name}" for name in names]
-
-    if scope.level == ScopeLevel.SEARCH_DIR:
-        return []
-
-    if scope.level == ScopeLevel.SEARCH_RESULTS:
-        rows = await search_rows(accessor, scope.table, scope.query,
-                                 config.search_limit)
-        names = _row_files(rows, config)
         return [f"{base}/{name}" for name in names]
 
     raise FileNotFoundError(path.original)

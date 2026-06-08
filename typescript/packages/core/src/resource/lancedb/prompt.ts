@@ -15,7 +15,8 @@
 export const LANCEDB_PROMPT = `This mount is a LanceDB table exposed as a filesystem.
 
 Directories are the configured group-by columns; descending narrows a filter.
-Each matching row is a <id>.md card plus a <id>.<ext> blob file. Semantic search
-is a virtual folder: read a query as a path segment, e.g.
-ls "_search/red running shoes" then cat "_search/red running shoes/<id>.md".
-Use ls/cd/cat/tree/find/wc as usual; quote queries that contain spaces.`
+Each matching row is a <id>.md card plus a <id>.<ext> blob file. For semantic
+search use the search command, which returns ranked rows as canonical file
+paths with a score, e.g. search "red running shoes" /mount then cat one of the
+returned <path>.md files. Use ls/cd/cat/tree/find/wc as usual; grep/rg stay
+lexical. Quote queries that contain spaces.`

@@ -127,8 +127,7 @@ async function main(): Promise<void> {
   const s = await ws.execute("stat -c '%s' /fashion/Men/Shoes/White/3.jpg")
   console.log(`  image size: ${DEC.decode(s.stdout).trim()} bytes`)
 
-  await show(ws, 'ls "/fashion/_search/white running sneakers"')
-  await show(ws, 'cat "/fashion/_search/white running sneakers/3.md"')
+  await show(ws, 'search "white running sneakers" /fashion')
 
   console.log("\n=== find /fashion -name '*.md' | wc -l ===")
   const f = await ws.execute("find /fashion -name '*.md' | wc -l")

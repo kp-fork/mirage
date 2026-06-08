@@ -18,8 +18,6 @@ import { PathSpec } from '../../types.ts'
 export const ScopeLevel = Object.freeze({
   ROOT: 'root',
   GROUP_DIR: 'group_dir',
-  SEARCH_DIR: 'search_dir',
-  SEARCH_RESULTS: 'search_results',
   ROW: 'row',
   UNKNOWN: 'unknown',
 } as const)
@@ -30,7 +28,6 @@ export interface LanceDBScope {
   level: ScopeLevel
   table: string | null
   filters: Record<string, string>
-  query: string | null
   rowId: string | null
   blob: boolean
   resourcePath: string
@@ -54,7 +51,6 @@ function make(
     level,
     table: over.table ?? null,
     filters: over.filters ?? {},
-    query: over.query ?? null,
     rowId: over.rowId ?? null,
     blob: over.blob ?? false,
     resourcePath,
@@ -75,22 +71,6 @@ export function detectScope(path: PathSpec | string, config: LanceDBConfigResolv
     if (segs.length === 0) return make(ScopeLevel.ROOT, raw)
     table = segs[0] ?? ''
     rest = segs.slice(1)
-  }
-
-  if (rest.length > 0 && rest[0] === config.searchDir) {
-    const qparts = rest.slice(1)
-    if (qparts.length === 0) return make(ScopeLevel.SEARCH_DIR, raw, { table })
-    const query = qparts[0] ?? ''
-    if (qparts.length === 1) {
-      return make(ScopeLevel.SEARCH_RESULTS, raw, { table, query })
-    }
-    if (qparts.length === 2) {
-      const parsed = parseRowFile(qparts[1] ?? '', config)
-      if (parsed !== null) {
-        return make(ScopeLevel.ROW, raw, { table, query, rowId: parsed[0], blob: parsed[1] })
-      }
-    }
-    return make(ScopeLevel.UNKNOWN, raw)
   }
 
   const gb = config.groupBy

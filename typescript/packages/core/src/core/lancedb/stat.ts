@@ -53,12 +53,7 @@ export async function stat(
     if (!tables.includes(scope.table)) throw notFound(spec.original)
   }
 
-  if (
-    scope.level === ScopeLevel.ROOT ||
-    scope.level === ScopeLevel.GROUP_DIR ||
-    scope.level === ScopeLevel.SEARCH_DIR ||
-    scope.level === ScopeLevel.SEARCH_RESULTS
-  ) {
+  if (scope.level === ScopeLevel.ROOT || scope.level === ScopeLevel.GROUP_DIR) {
     return new FileStat({ name: nameOf(spec), type: FileType.DIRECTORY })
   }
 

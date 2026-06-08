@@ -38,14 +38,6 @@ async def test_read_blob_returns_raw_bytes(accessor):
 
 
 @pytest.mark.asyncio
-async def test_read_search_card_has_score(accessor):
-    path = _ps("/animals/_search/a small white dog/4.md")
-    data = (await read(accessor, path)).decode()
-    assert "# a small white dog" in data
-    assert "score:" in data
-
-
-@pytest.mark.asyncio
 async def test_read_missing_row_raises(accessor):
     with pytest.raises(FileNotFoundError):
         await read(accessor, _ps("/animals/cat/big/999.md"))

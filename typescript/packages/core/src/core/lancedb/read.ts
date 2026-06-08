@@ -27,13 +27,6 @@ function notFound(p: string): Error {
 
 async function resolveRow(accessor: LanceDBAccessor, scope: LanceDBScope): Promise<LanceRow> {
   const config = accessor.config
-  if (scope.query !== null && scope.table !== null) {
-    const rows = await accessor.searchRows(scope.table, scope.query, config.searchLimit)
-    for (const row of rows) {
-      if (String(row[config.idColumn]) === String(scope.rowId)) return row
-    }
-    throw notFound(scope.resourcePath)
-  }
   if (scope.table === null || scope.rowId === null) throw notFound(scope.resourcePath)
   const row = await accessor.driver.rowRecord(scope.table, config.idColumn, scope.rowId)
   if (row === null) throw notFound(scope.resourcePath)

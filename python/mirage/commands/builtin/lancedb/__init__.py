@@ -18,6 +18,7 @@ from mirage.commands.builtin.lancedb.grep import grep
 from mirage.commands.builtin.lancedb.head import head
 from mirage.commands.builtin.lancedb.ls import ls
 from mirage.commands.builtin.lancedb.rg import rg
+from mirage.commands.builtin.lancedb.search import search
 from mirage.commands.builtin.lancedb.stat import stat
 from mirage.commands.builtin.lancedb.tail import tail
 from mirage.commands.builtin.lancedb.tree import tree
@@ -30,6 +31,7 @@ COMMANDS = [
     head,
     ls,
     rg,
+    search,
     stat,
     tail,
     tree,

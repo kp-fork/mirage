@@ -22,8 +22,6 @@ from mirage.types import PathSpec
 class ScopeLevel(str, Enum):
     ROOT = "root"
     GROUP_DIR = "group_dir"
-    SEARCH_DIR = "search_dir"
-    SEARCH_RESULTS = "search_results"
     ROW = "row"
     UNKNOWN = "unknown"
 
@@ -33,13 +31,13 @@ class LanceDBScope:
     level: ScopeLevel
     table: str | None = None
     filters: dict[str, str] = field(default_factory=dict)
-    query: str | None = None
     row_id: str | None = None
     blob: bool = False
     resource_path: str = "/"
 
 
-def _parse_row_file(name: str, config: LanceDBConfig) -> tuple[str, bool] | None:
+def _parse_row_file(name: str,
+                    config: LanceDBConfig) -> tuple[str, bool] | None:
     if name.endswith(".md"):
         return name[:-len(".md")], False
     if config.blob_column:
@@ -62,29 +60,6 @@ def detect_scope(path, config: LanceDBConfig) -> LanceDBScope:
             return LanceDBScope(level=ScopeLevel.ROOT, resource_path=raw)
         table = segs[0]
         rest = segs[1:]
-
-    if rest and rest[0] == config.search_dir:
-        qparts = rest[1:]
-        if not qparts:
-            return LanceDBScope(level=ScopeLevel.SEARCH_DIR,
-                                table=table,
-                                resource_path=raw)
-        query = qparts[0]
-        if len(qparts) == 1:
-            return LanceDBScope(level=ScopeLevel.SEARCH_RESULTS,
-                                table=table,
-                                query=query,
-                                resource_path=raw)
-        if len(qparts) == 2:
-            parsed = _parse_row_file(qparts[1], config)
-            if parsed is not None:
-                return LanceDBScope(level=ScopeLevel.ROW,
-                                    table=table,
-                                    query=query,
-                                    row_id=parsed[0],
-                                    blob=parsed[1],
-                                    resource_path=raw)
-        return LanceDBScope(level=ScopeLevel.UNKNOWN, resource_path=raw)
 
     gb = config.group_by
     n = len(gb)

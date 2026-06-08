@@ -60,16 +60,6 @@ describe('lancedb scope', () => {
     expect(s.blob).toBe(true)
   })
 
-  it('search results and row', () => {
-    expect(detectScope(ps('/animals/_search/black cat'), config).level).toBe(
-      ScopeLevel.SEARCH_RESULTS,
-    )
-    const row = detectScope(ps('/animals/_search/black cat/3.md'), config)
-    expect(row.level).toBe(ScopeLevel.ROW)
-    expect(row.query).toBe('black cat')
-    expect(row.rowId).toBe('3')
-  })
-
   it('single-table pin elides the table level', () => {
     const pinned = resolveLanceDBConfig({
       uri: '/tmp/db',

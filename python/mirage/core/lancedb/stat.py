@@ -48,8 +48,7 @@ async def stat(
     if scope.table and not await table_exists(accessor, scope.table):
         raise FileNotFoundError(path.original)
 
-    if scope.level in (ScopeLevel.ROOT, ScopeLevel.GROUP_DIR,
-                       ScopeLevel.SEARCH_DIR, ScopeLevel.SEARCH_RESULTS):
+    if scope.level in (ScopeLevel.ROOT, ScopeLevel.GROUP_DIR):
         return FileStat(name=_name_of(path), type=FileType.DIRECTORY)
 
     data = await read(accessor, path, index)
