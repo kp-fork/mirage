@@ -25,6 +25,7 @@ import { DISCORD_GREP } from './grep.ts'
 import { DISCORD_HEAD } from './head.ts'
 import { DISCORD_JQ } from './jq.ts'
 import { DISCORD_LS } from './ls.ts'
+import { DISCORD_REALPATH } from './realpath.ts'
 import { DISCORD_RG } from './rg.ts'
 import { DISCORD_STAT } from './stat.ts'
 import { DISCORD_TAIL } from './tail.ts'
@@ -45,6 +46,7 @@ export const DISCORD_COMMANDS: readonly RegisteredCommand[] = [
   ...DISCORD_JQ,
   ...DISCORD_BASENAME,
   ...DISCORD_DIRNAME,
+  ...DISCORD_REALPATH,
   ...DISCORD_SEND_MESSAGE,
   ...DISCORD_ADD_REACTION,
   ...DISCORD_GET_SERVER_INFO,
