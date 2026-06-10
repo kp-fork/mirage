@@ -30,11 +30,11 @@ interface WalkEntry {
   file: boolean
 }
 
-function isEnoent(err: unknown): boolean {
+export function isEnoent(err: unknown): boolean {
   return err instanceof Error && (err as Error & { code?: string }).code === 'ENOENT'
 }
 
-function modifiedTs(modified: string | null): number | null {
+export function modifiedTs(modified: string | null): number | null {
   // Naive timestamps are UTC, mirroring the Python implementation.
   if (modified === null || modified === '') return null
   const hasTz = /(?:Z|[+-]\d{2}:?\d{2})$/.test(modified)
