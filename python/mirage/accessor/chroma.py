@@ -1,5 +1,6 @@
-import chromadb
 from typing import Any
+
+import chromadb
 
 from mirage.accessor.base import Accessor
 from mirage.resource.chroma.config import ChromaConfig

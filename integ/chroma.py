@@ -6,8 +6,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mirage import MountMode, Workspace
-from mirage.resource.chroma import ChromaConfig, ChromaResource
+from mirage import MountMode, Workspace  # noqa: E402
+from mirage.resource.chroma import ChromaConfig, ChromaResource  # noqa: E402
 
 MOUNT = "/knowledge/"
 
@@ -40,71 +40,111 @@ PATH_TREE: dict[str, dict] = {
 CHUNKS: dict[str, list[dict]] = {
     "guides/quickstart.md": [
         {
-            "document": "Welcome to Acme. This quickstart gets you running fast.",
-            "metadata": {"page_slug": "guides/quickstart.md", "chunk_index": 0},
+            "document":
+            "Welcome to Acme. This quickstart gets you running fast.",
+            "metadata": {
+                "page_slug": "guides/quickstart.md",
+                "chunk_index": 0
+            },
         },
         {
-            "document": "Install the CLI with npm i -g acme then run acme login.",
-            "metadata": {"page_slug": "guides/quickstart.md", "chunk_index": 1},
+            "document":
+            "Install the CLI with npm i -g acme then run acme login.",
+            "metadata": {
+                "page_slug": "guides/quickstart.md",
+                "chunk_index": 1
+            },
         },
         {
-            "document": "Set your token in the ACME_TOKEN environment variable.",
-            "metadata": {"page_slug": "guides/quickstart.md", "chunk_index": 2},
+            "document":
+            "Set your token in the ACME_TOKEN environment variable.",
+            "metadata": {
+                "page_slug": "guides/quickstart.md",
+                "chunk_index": 2
+            },
         },
     ],
     "guides/auth.md": [
         {
             "document":
             "Authentication uses bearer tokens via the Authorization header.",
-            "metadata": {"page_slug": "guides/auth.md", "chunk_index": 0},
+            "metadata": {
+                "page_slug": "guides/auth.md",
+                "chunk_index": 0
+            },
         },
         {
             "document":
             "Requests are rate limited to 100 calls per minute per token.",
-            "metadata": {"page_slug": "guides/auth.md", "chunk_index": 1},
+            "metadata": {
+                "page_slug": "guides/auth.md",
+                "chunk_index": 1
+            },
         },
         {
             "document":
             "If you exceed the limit you receive HTTP 429 and must back off.",
-            "metadata": {"page_slug": "guides/auth.md", "chunk_index": 2},
+            "metadata": {
+                "page_slug": "guides/auth.md",
+                "chunk_index": 2
+            },
         },
     ],
     "policies/refunds.md": [
         {
             "document": "Refunds are available within 30 days of purchase.",
-            "metadata": {"page_slug": "policies/refunds.md", "chunk_index": 0},
+            "metadata": {
+                "page_slug": "policies/refunds.md",
+                "chunk_index": 0
+            },
         },
         {
-            "document":
-            "Email support to start a refund with your order id.",
-            "metadata": {"page_slug": "policies/refunds.md", "chunk_index": 1},
+            "document": "Email support to start a refund with your order id.",
+            "metadata": {
+                "page_slug": "policies/refunds.md",
+                "chunk_index": 1
+            },
         },
         {
             "document":
             "Approved refunds are processed within five business days.",
-            "metadata": {"page_slug": "policies/refunds.md", "chunk_index": 2},
+            "metadata": {
+                "page_slug": "policies/refunds.md",
+                "chunk_index": 2
+            },
         },
     ],
     "policies/privacy.md": [
         {
             "document":
             "Customer data is stored encrypted at rest and in transit.",
-            "metadata": {"page_slug": "policies/privacy.md", "chunk_index": 0},
+            "metadata": {
+                "page_slug": "policies/privacy.md",
+                "chunk_index": 0
+            },
         },
         {
             "document": "You may request deletion of your data at any time.",
-            "metadata": {"page_slug": "policies/privacy.md", "chunk_index": 1},
+            "metadata": {
+                "page_slug": "policies/privacy.md",
+                "chunk_index": 1
+            },
         },
     ],
     "CHANGELOG.md": [
         {
-            "document":
-            "v2.0 added rate limit headers and refund automation.",
-            "metadata": {"page_slug": "CHANGELOG.md", "chunk_index": 0},
+            "document": "v2.0 added rate limit headers and refund automation.",
+            "metadata": {
+                "page_slug": "CHANGELOG.md",
+                "chunk_index": 0
+            },
         },
         {
             "document": "v1.5 introduced encrypted data exports.",
-            "metadata": {"page_slug": "CHANGELOG.md", "chunk_index": 1},
+            "metadata": {
+                "page_slug": "CHANGELOG.md",
+                "chunk_index": 1
+            },
         },
     ],
 }
@@ -130,8 +170,7 @@ class FakeCollection:
             slug_eq = slug.get("$eq")
             if slug_in is not None:
                 where_doc = kwargs.get("where_document") or {}
-                pattern = where_doc.get("$contains") or where_doc.get(
-                    "$regex")
+                pattern = where_doc.get("$contains") or where_doc.get("$regex")
                 docs, metas = [], []
                 for s in slug_in:
                     for chunk in CHUNKS.get(s, []):
@@ -172,8 +211,8 @@ class FakeCollection:
                  "Requests are rate limited to 100 calls per minute per token."
                  ),
                 (0.12, "guides/auth.md",
-                 "If you exceed the limit you receive HTTP 429 and must back off."
-                 ),
+                 "If you exceed the limit you receive HTTP 429"
+                 " and must back off."),
             ]
         elif "refund" in lowered or "money" in lowered:
             scored = [
@@ -198,7 +237,9 @@ class FakeCollection:
 
         return {
             "documents": [[t for _, _, t in scored]],
-            "metadatas": [[{"page_slug": s} for _, s, _ in scored]],
+            "metadatas": [[{
+                "page_slug": s
+            } for _, s, _ in scored]],
             "distances": [[d for d, _, _ in scored]],
         }
 

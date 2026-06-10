@@ -165,7 +165,8 @@
                 "pages": [
                   "home/setup/mongodb",
                   "home/setup/postgres",
-                  "home/setup/chroma"
+                  "home/setup/chroma",
+                  "home/setup/lancedb"
                 ]
               },
               {
@@ -307,7 +308,8 @@
                 "pages": [
                   "python/resource/mongodb",
                   "python/resource/postgres",
-                  "python/resource/chroma"
+                  "python/resource/chroma",
+                  "python/resource/lancedb"
                 ]
               },
               {
@@ -434,7 +436,8 @@
                 "icon": "database",
                 "pages": [
                   "typescript/setup/mongodb",
-                  "typescript/setup/postgres"
+                  "typescript/setup/postgres",
+                  "typescript/setup/lancedb"
                 ]
               },
               {
