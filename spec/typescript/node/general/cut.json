@@ -11,6 +11,7 @@
     "resources": [
       "box",
       "chroma",
+      "databricks_volume",
       "disk",
       "dropbox",
       "gdrive",
