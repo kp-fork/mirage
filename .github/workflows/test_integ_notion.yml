@@ -86,6 +86,10 @@ jobs:
         working-directory: typescript
         run: pnpm --filter @struktoai/mirage-node build
 
+      - name: Build mirage-browser
+        working-directory: typescript
+        run: pnpm --filter @struktoai/mirage-browser build
+
       - name: Run notion integ (TS, mock server) and diff against truth
         working-directory: integ
         run: |
