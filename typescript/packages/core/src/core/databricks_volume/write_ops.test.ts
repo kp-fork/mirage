@@ -108,8 +108,8 @@ describe('mkdir', () => {
     vi.stubGlobal('fetch', fetch)
     await mkdir(makeAccessor(), spec('/volume/a/b'), undefined, true)
     expect(calls).toHaveLength(1)
-    expect(calls[0].method).toBe('PUT')
-    expect(calls[0].url).toContain('/fs/directories/')
+    expect(calls[0]?.method).toBe('PUT')
+    expect(calls[0]?.url).toContain('/fs/directories/')
   })
 
   it('creates after parent check when target is missing', async () => {

@@ -42,7 +42,7 @@ describe('readBytes', () => {
     vi.stubGlobal('fetch', fetch)
     const data = await readBytes(makeAccessor(), spec('/volume/a.txt'))
     expect(new TextDecoder().decode(data)).toBe('hello')
-    expect(calls[0].headers.Range).toBeUndefined()
+    expect(calls[0]?.headers.Range).toBeUndefined()
   })
 
   it('sends Range for offset/size reads', async () => {
@@ -53,7 +53,7 @@ describe('readBytes', () => {
       size: 3,
     })
     expect(new TextDecoder().decode(data)).toBe('ell')
-    expect(calls[0].headers.Range).toBe('bytes=1-3')
+    expect(calls[0]?.headers.Range).toBe('bytes=1-3')
   })
 
   it('short-circuits size=0 reads without a request', async () => {

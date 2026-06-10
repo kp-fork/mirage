@@ -40,8 +40,8 @@ describe('stat', () => {
     expect(st.size).toBe(42)
     expect(st.modified).toBe('2026-06-10T01:02:03.000Z')
     expect(st.type).not.toBe(FileType.DIRECTORY)
-    expect(calls[0].method).toBe('HEAD')
-    expect(calls[0].url).toContain('/fs/files/')
+    expect(calls[0]?.method).toBe('HEAD')
+    expect(calls[0]?.url).toContain('/fs/files/')
   })
 
   it('falls back to directory metadata on file 404', async () => {
@@ -54,7 +54,7 @@ describe('stat', () => {
     expect(st.name).toBe('reports')
     expect(st.type).toBe(FileType.DIRECTORY)
     expect(calls.map((c) => c.method)).toEqual(['HEAD', 'HEAD'])
-    expect(calls[1].url).toContain('/fs/directories/')
+    expect(calls[1]?.url).toContain('/fs/directories/')
   })
 
   it('raises ENOENT when neither file nor directory exists', async () => {

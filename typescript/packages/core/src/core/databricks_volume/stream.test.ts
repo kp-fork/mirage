@@ -52,7 +52,7 @@ describe('readStream', () => {
     vi.stubGlobal('fetch', fetch)
     const chunks = await collect(readStream(makeAccessor(), spec('/volume/small.bin')))
     expect(chunks).toHaveLength(1)
-    expect(Array.from(chunks[0])).toEqual([1, 2, 3])
+    expect(Array.from(chunks[0] ?? [])).toEqual([1, 2, 3])
   })
 
   it('raises ENOENT for missing files', async () => {
