@@ -26,26 +26,6 @@ name: Integ (databases)
       - .github/workflows/test_integ_databases.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/mongodb.py
-      - integ/truth_mongodb.txt
-      - integ/chroma.py
-      - integ/chroma.ts
-      - integ/truth_chroma.txt
-      - integ/check_lines.sh
-      - python/mirage/accessor/mongodb.py
-      - python/mirage/core/mongodb/**
-      - python/mirage/commands/builtin/mongodb/**
-      - python/mirage/resource/mongodb/**
-      - python/mirage/accessor/chroma.py
-      - python/mirage/core/chroma/**
-      - python/mirage/commands/builtin/chroma/**
-      - python/mirage/resource/chroma/**
-      - typescript/packages/core/src/accessor/chroma.ts
-      - typescript/packages/core/src/core/chroma/**
-      - typescript/packages/core/src/commands/builtin/chroma/**
-      - typescript/packages/core/src/resource/chroma/**
-      - typescript/packages/core/src/ops/chroma/**
   workflow_dispatch:
 
 concurrency:
@@ -53,7 +33,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/mongodb.py'
+              - 'integ/truth_mongodb.txt'
+              - 'integ/chroma.py'
+              - 'integ/chroma.ts'
+              - 'integ/truth_chroma.txt'
+              - 'integ/check_lines.sh'
+              - 'python/mirage/accessor/mongodb.py'
+              - 'python/mirage/core/mongodb/**'
+              - 'python/mirage/commands/builtin/mongodb/**'
+              - 'python/mirage/resource/mongodb/**'
+              - 'python/mirage/accessor/chroma.py'
+              - 'python/mirage/core/chroma/**'
+              - 'python/mirage/commands/builtin/chroma/**'
+              - 'python/mirage/resource/chroma/**'
+              - 'typescript/packages/core/src/accessor/chroma.ts'
+              - 'typescript/packages/core/src/core/chroma/**'
+              - 'typescript/packages/core/src/commands/builtin/chroma/**'
+              - 'typescript/packages/core/src/resource/chroma/**'
+              - 'typescript/packages/core/src/ops/chroma/**'
+
   integ-mongodb:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -92,6 +107,8 @@ jobs:
             | bash integ/check_lines.sh integ/truth_mongodb.txt
 
   integ-chroma:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       chroma:
@@ -130,6 +147,8 @@ jobs:
           diff integ/truth_chroma.txt /tmp/chroma.out
 
   integ-chroma-ts:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       chroma:
@@ -175,3 +194,17 @@ jobs:
         run: |
           pnpm exec tsx chroma.ts > /tmp/ts-chroma.out
           diff truth_chroma.txt /tmp/ts-chroma.out
+
+  gate:
+    name: integ-databases-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ-mongodb, integ-chroma, integ-chroma-ts]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac

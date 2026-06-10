@@ -12,10 +12,6 @@ permissions:
       - .github/workflows/test_integ.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/**
-      - python/**
-      - .github/workflows/test_integ.yml
   workflow_dispatch:
 
 concurrency:
@@ -23,7 +19,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/**'
+              - 'python/**'
+              - '.github/workflows/test_integ.yml'
+
   integ:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       redis:
@@ -73,3 +88,17 @@ jobs:
         run: |
           ./python/.venv/bin/python integ/safeguard.py > /tmp/safeguard.out
           diff integ/truth_safeguard.txt /tmp/safeguard.out
+
+  gate:
+    name: integ-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac

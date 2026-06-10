@@ -12,10 +12,6 @@ permissions:
       - .github/workflows/test_integ_ts.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/**
-      - typescript/**
-      - .github/workflows/test_integ_ts.yml
   workflow_dispatch:
 
 concurrency:
@@ -23,7 +19,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/**'
+              - 'typescript/**'
+              - '.github/workflows/test_integ_ts.yml'
+
   integ:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       redis:
@@ -136,3 +151,17 @@ jobs:
         run: |
           pnpm exec tsx s3.ts > /tmp/ts-s3-native.out
           diff truth_s3_ts.txt /tmp/ts-s3-native.out
+
+  gate:
+    name: integ-ts-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac

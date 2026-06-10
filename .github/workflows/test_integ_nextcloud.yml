@@ -17,15 +17,6 @@ permissions:
       - .github/workflows/test_integ_nextcloud.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/nextcloud.py
-      - integ/truth_nextcloud.txt
-      - integ/check_lines.sh
-      - python/mirage/accessor/nextcloud.py
-      - python/mirage/core/nextcloud/**
-      - python/mirage/commands/builtin/nextcloud/**
-      - python/mirage/resource/nextcloud/**
-      - .github/workflows/test_integ_nextcloud.yml
   workflow_dispatch:
 
 concurrency:
@@ -33,7 +24,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/nextcloud.py'
+              - 'integ/truth_nextcloud.txt'
+              - 'integ/check_lines.sh'
+              - 'python/mirage/accessor/nextcloud.py'
+              - 'python/mirage/core/nextcloud/**'
+              - 'python/mirage/commands/builtin/nextcloud/**'
+              - 'python/mirage/resource/nextcloud/**'
+              - '.github/workflows/test_integ_nextcloud.yml'
+
   integ-nextcloud:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       nextcloud:
@@ -86,3 +101,17 @@ jobs:
           set -o pipefail
           ./python/.venv/bin/python integ/nextcloud.py 2>&1 \
             | bash integ/check_lines.sh integ/truth_nextcloud.txt
+
+  gate:
+    name: integ-nextcloud-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ-nextcloud]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac

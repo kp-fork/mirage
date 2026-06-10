@@ -13,11 +13,6 @@ permissions:
       - .github/workflows/test_integ_s3.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/**
-      - data/**
-      - python/**
-      - .github/workflows/test_integ_s3.yml
   workflow_dispatch:
 
 concurrency:
@@ -25,7 +20,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/**'
+              - 'data/**'
+              - 'python/**'
+              - '.github/workflows/test_integ_s3.yml'
+
   integ-s3:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -53,3 +68,17 @@ jobs:
         run: |
           ./python/.venv/bin/python integ/s3_cases.py > /tmp/s3_cases.out
           diff integ/truth.txt /tmp/s3_cases.out
+
+  gate:
+    name: integ-s3-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ-s3]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac

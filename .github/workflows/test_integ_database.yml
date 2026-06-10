@@ -26,24 +26,6 @@ permissions:
       - .github/workflows/test_integ_database.yml
   pull_request:
     branches: [main]
-    paths:
-      - integ/mongodb.py
-      - integ/mongodb.ts
-      - integ/truth_mongodb.txt
-      - integ/postgres.py
-      - integ/postgres.ts
-      - integ/truth_postgres.txt
-      - integ/check_lines.sh
-      - python/mirage/accessor/mongodb.py
-      - python/mirage/core/mongodb/**
-      - python/mirage/commands/builtin/mongodb/**
-      - python/mirage/resource/mongodb/**
-      - python/mirage/accessor/postgres.py
-      - python/mirage/core/postgres/**
-      - python/mirage/commands/builtin/postgres/**
-      - python/mirage/resource/postgres/**
-      - typescript/**
-      - .github/workflows/test_integ_database.yml
   workflow_dispatch:
 
 concurrency:
@@ -51,7 +33,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: read
+    outputs:
+      hit: ${{ steps.filter.outputs.hit }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            hit:
+              - 'integ/mongodb.py'
+              - 'integ/mongodb.ts'
+              - 'integ/truth_mongodb.txt'
+              - 'integ/postgres.py'
+              - 'integ/postgres.ts'
+              - 'integ/truth_postgres.txt'
+              - 'integ/check_lines.sh'
+              - 'python/mirage/accessor/mongodb.py'
+              - 'python/mirage/core/mongodb/**'
+              - 'python/mirage/commands/builtin/mongodb/**'
+              - 'python/mirage/resource/mongodb/**'
+              - 'python/mirage/accessor/postgres.py'
+              - 'python/mirage/core/postgres/**'
+              - 'python/mirage/commands/builtin/postgres/**'
+              - 'python/mirage/resource/postgres/**'
+              - 'typescript/**'
+              - '.github/workflows/test_integ_database.yml'
+
   integ-database:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -111,6 +126,8 @@ jobs:
             | bash integ/check_lines.sh integ/truth_postgres.txt
 
   integ-database-ts:
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.hit == 'true') }}
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -178,3 +195,17 @@ jobs:
           set -o pipefail
           pnpm exec tsx postgres.ts 2>&1 \
             | bash check_lines.sh truth_postgres.txt
+
+  gate:
+    name: integ-database-gate
+    runs-on: ubuntu-latest
+    needs: [changes, integ-database, integ-database-ts]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "$results"
+          case "$results" in
+            *failure*|*cancelled*) exit 1 ;;
+          esac
