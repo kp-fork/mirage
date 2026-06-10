@@ -43,7 +43,7 @@ async def page_chunks(accessor, slug: str) -> list[dict[str, Any]]:
         )
         documents = result.get("documents") or []
         metadatas = result.get("metadatas") or [{} for _ in documents]
-        for document, metadata in zip(documents, metadatas, strict=False):
+        for document, metadata in zip(documents, metadatas, strict=True):
             chunks.append({
                 "document": "" if document is None else str(document),
                 "metadata": metadata if isinstance(metadata, dict) else {},

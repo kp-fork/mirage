@@ -110,7 +110,8 @@ audio    = ["av>=17.0.0", "sherpa-onnx>=1.12.34", "tinytag>=2.2.1"]
 langfuse = ["langfuse>=4.2.0"]
 
 # --- chroma ---
-chroma   = ["chromadb>=1.0.0"]
+# thin HTTP-only client; the accessor uses AsyncHttpClient exclusively
+chroma   = ["chromadb-client>=1.0.0"]
 
 # --- anthropic ---
 anthropic   = ["anthropic>=0.88"]

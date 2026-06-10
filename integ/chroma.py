@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import sys
 from functools import partial
 from pathlib import Path
@@ -170,12 +171,20 @@ class FakeCollection:
             slug_eq = slug.get("$eq")
             if slug_in is not None:
                 where_doc = kwargs.get("where_document") or {}
-                pattern = where_doc.get("$contains") or where_doc.get("$regex")
+                contains = where_doc.get("$contains")
+                regex = where_doc.get("$regex")
                 docs, metas = [], []
                 for s in slug_in:
                     for chunk in CHUNKS.get(s, []):
-                        if pattern is None or pattern in chunk["document"]:
-                            docs.append(chunk["document"])
+                        document = chunk["document"]
+                        if contains is not None:
+                            matched = contains in document
+                        elif regex is not None:
+                            matched = re.search(regex, document) is not None
+                        else:
+                            matched = True
+                        if matched:
+                            docs.append(document)
                             metas.append(chunk["metadata"])
                 return {"documents": docs, "metadatas": metas}
             slug = slug_eq
@@ -263,6 +272,19 @@ PER_MOUNT_CASES: list[tuple[str, str]] = [
     ("grep_r_refund", "grep -r refund {root}policies/"),
     ("grep_rl_encrypted", "grep -rl encrypted {root}"),
     ("grep_v_bearer", "grep -v bearer {root}guides/auth.md"),
+    ("grep_rE_alternation", 'grep -rE "rate limited|refund" {root}'),
+    ("wc_l_auth", "wc -l {root}guides/auth.md"),
+    ("sort_auth", "sort {root}guides/auth.md"),
+    ("uniq_auth", "uniq {root}guides/auth.md"),
+    ("uniq_w0_auth", "uniq -w 0 {root}guides/auth.md"),
+    ("stat_name_auth", 'stat -c "%n" {root}guides/auth.md'),
+    ("cut_d_f1", "cut -d ' ' -f 1 {root}guides/quickstart.md"),
+    ("awk_first_word", "awk '{{print $1}}' {root}guides/quickstart.md"),
+    ("sed_upper_acme", "sed s/Acme/ACME/ {root}guides/quickstart.md"),
+    ("rg_l_token", "rg -l token {root}"),
+    ("pipe_cat_wc", "cat {root}guides/auth.md | wc -l"),
+    ("pipe_sort_uniq_wc", "cat {root}policies/refunds.md | sort | uniq"
+     " | wc -l"),
 ]
 
 SEARCH_CASES: list[tuple[str, str]] = [

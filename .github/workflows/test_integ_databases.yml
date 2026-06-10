@@ -1,0 +1,127 @@
+name: Integ (databases)
+
+"on":
+  push:
+    branches: [main]
+    paths:
+      - integ/mongodb.py
+      - integ/truth_mongodb.txt
+      - integ/chroma.py
+      - integ/chroma_live.py
+      - integ/truth_chroma.txt
+      - integ/truth_chroma_live.txt
+      - integ/check_lines.sh
+      - python/mirage/accessor/mongodb.py
+      - python/mirage/core/mongodb/**
+      - python/mirage/commands/builtin/mongodb/**
+      - python/mirage/resource/mongodb/**
+      - python/mirage/accessor/chroma.py
+      - python/mirage/core/chroma/**
+      - python/mirage/commands/builtin/chroma/**
+      - python/mirage/resource/chroma/**
+      - .github/workflows/test_integ_databases.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - integ/mongodb.py
+      - integ/truth_mongodb.txt
+      - integ/chroma.py
+      - integ/chroma_live.py
+      - integ/truth_chroma.txt
+      - integ/truth_chroma_live.txt
+      - integ/check_lines.sh
+      - python/mirage/accessor/mongodb.py
+      - python/mirage/core/mongodb/**
+      - python/mirage/commands/builtin/mongodb/**
+      - python/mirage/resource/mongodb/**
+      - python/mirage/accessor/chroma.py
+      - python/mirage/core/chroma/**
+      - python/mirage/commands/builtin/chroma/**
+      - python/mirage/resource/chroma/**
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integ-mongodb:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      MONGODB_URI: mongodb://localhost:27017
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install Python dependencies
+        working-directory: python
+        run: uv sync --all-extras --no-extra camel
+
+      - name: Run MongoDB backend and check against truth
+        shell: bash
+        run: |
+          set -o pipefail
+          ./python/.venv/bin/python integ/mongodb.py 2>&1 \
+            | bash integ/check_lines.sh integ/truth_mongodb.txt
+
+  integ-chroma:
+    runs-on: ubuntu-latest
+    services:
+      chroma:
+        image: chromadb/chroma:latest
+        ports:
+          - 8000:8000
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install Python dependencies
+        working-directory: python
+        run: uv sync --all-extras --no-extra camel
+
+      - name: Run chroma integ (mock collection) and diff against truth
+        run: |
+          ./python/.venv/bin/python integ/chroma.py > /tmp/chroma.out
+          diff integ/truth_chroma.txt /tmp/chroma.out
+
+      - name: Wait for ChromaDB OSS
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/api/v2/heartbeat && exit 0
+            sleep 1
+          done
+          echo "ChromaDB did not become healthy" >&2
+          exit 1
+
+      - name: Run chroma integ (ChromaDB OSS) and diff against truth
+        run: |
+          ./python/.venv/bin/python integ/chroma_live.py > /tmp/chroma_live.out
+          diff integ/truth_chroma_live.txt /tmp/chroma_live.out
