@@ -15,7 +15,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { RAMIndexCacheStore } from '../../cache/index/ram.ts'
 import { readdir } from './readdir.ts'
-import { jsonResponse, makeAccessor, notFoundResponse, routedFetch, spec, TEST_ROOT } from './_test_util.ts'
+import {
+  jsonResponse,
+  makeAccessor,
+  notFoundResponse,
+  routedFetch,
+  spec,
+  TEST_ROOT,
+} from './_test_util.ts'
 
 afterEach(() => {
   vi.unstubAllGlobals()

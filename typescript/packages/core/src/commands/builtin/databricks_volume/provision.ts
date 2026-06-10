@@ -74,7 +74,11 @@ export async function fileReadProvision(
     return new ProvisionResult({ precision: Precision.UNKNOWN })
   }
   const index = opts.index ?? undefined
-  const { resolved, missing } = await resolveSizes(accessor as DatabricksVolumeAccessor, paths, index)
+  const { resolved, missing } = await resolveSizes(
+    accessor as DatabricksVolumeAccessor,
+    paths,
+    index,
+  )
   if (missing > 0 || resolved.length === 0) {
     return new ProvisionResult({ precision: Precision.UNKNOWN })
   }
@@ -97,7 +101,11 @@ export async function headTailProvision(
     return new ProvisionResult({ precision: Precision.UNKNOWN })
   }
   const index = opts.index ?? undefined
-  const { resolved, missing } = await resolveSizes(accessor as DatabricksVolumeAccessor, paths, index)
+  const { resolved, missing } = await resolveSizes(
+    accessor as DatabricksVolumeAccessor,
+    paths,
+    index,
+  )
   if (missing > 0 || resolved.length === 0) {
     return new ProvisionResult({ precision: Precision.UNKNOWN })
   }

@@ -18,13 +18,7 @@ import {
   normalizeDatabricksVolumeConfig,
   type DatabricksVolumeConfig,
 } from '../../resource/databricks_volume/config.ts'
-import {
-  backendPath,
-  configuredRoot,
-  normalizePosix,
-  virtualPath,
-  volumeRoot,
-} from './path.ts'
+import { backendPath, configuredRoot, normalizePosix, virtualPath, volumeRoot } from './path.ts'
 
 const CONFIG: DatabricksVolumeConfig = normalizeDatabricksVolumeConfig({
   catalog: 'main',
@@ -119,9 +113,7 @@ describe('virtualPath', () => {
   })
 
   it('returns the prefix for the root itself', () => {
-    expect(virtualPath(CONFIG, '/Volumes/main/default/agent_files/root', '/volume')).toBe(
-      '/volume',
-    )
+    expect(virtualPath(CONFIG, '/Volumes/main/default/agent_files/root', '/volume')).toBe('/volume')
   })
 
   it('rejects backend paths outside the root', () => {

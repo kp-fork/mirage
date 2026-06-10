@@ -46,9 +46,7 @@ describe('readStream', () => {
   })
 
   it('coalesces small network chunks', async () => {
-    const { fetch } = routedFetch(() =>
-      bodyResponse([new Uint8Array([1, 2]), new Uint8Array([3])]),
-    )
+    const { fetch } = routedFetch(() => bodyResponse([new Uint8Array([1, 2]), new Uint8Array([3])]))
     vi.stubGlobal('fetch', fetch)
     const chunks = await collect(readStream(makeAccessor(), spec('/volume/small.bin')))
     expect(chunks).toHaveLength(1)

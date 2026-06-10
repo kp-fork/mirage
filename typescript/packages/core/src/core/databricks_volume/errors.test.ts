@@ -26,9 +26,7 @@ describe('isNotFound', () => {
   })
 
   it('matches databricks not-found error codes', () => {
-    expect(isNotFound(new DatabricksVolumeApiError('x', 500, 'RESOURCE_DOES_NOT_EXIST'))).toBe(
-      true,
-    )
+    expect(isNotFound(new DatabricksVolumeApiError('x', 500, 'RESOURCE_DOES_NOT_EXIST'))).toBe(true)
     expect(isNotFound(new DatabricksVolumeApiError('x', 500, 'NOT_FOUND'))).toBe(true)
   })
 
@@ -38,9 +36,7 @@ describe('isNotFound', () => {
   })
 
   it('rejects other errors and non-errors', () => {
-    expect(isNotFound(new DatabricksVolumeApiError('denied', 403, 'PERMISSION_DENIED'))).toBe(
-      false,
-    )
+    expect(isNotFound(new DatabricksVolumeApiError('denied', 403, 'PERMISSION_DENIED'))).toBe(false)
     expect(isNotFound('not an error')).toBe(false)
   })
 })

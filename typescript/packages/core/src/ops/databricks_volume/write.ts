@@ -23,7 +23,12 @@ export const writeOp: RegisteredOp = {
   resource: ResourceName.DATABRICKS_VOLUME,
   filetype: null,
   write: true,
-  fn: (accessor: DatabricksVolumeAccessor, path: PathSpec, args: readonly unknown[], kwargs: OpKwargs) => {
+  fn: (
+    accessor: DatabricksVolumeAccessor,
+    path: PathSpec,
+    args: readonly unknown[],
+    kwargs: OpKwargs,
+  ) => {
     const data = extractWriteData(args)
     return writeBytes(accessor, path, data, kwargs.index)
   },

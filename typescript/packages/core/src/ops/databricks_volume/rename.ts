@@ -22,7 +22,12 @@ export const renameOp: RegisteredOp = {
   resource: ResourceName.DATABRICKS_VOLUME,
   filetype: null,
   write: true,
-  fn: (accessor: DatabricksVolumeAccessor, path: PathSpec, args: readonly unknown[], kwargs: OpKwargs) => {
+  fn: (
+    accessor: DatabricksVolumeAccessor,
+    path: PathSpec,
+    args: readonly unknown[],
+    kwargs: OpKwargs,
+  ) => {
     const dst = args[0]
     if (dst === null || typeof dst !== 'object' || !('original' in dst)) {
       throw new TypeError('rename op requires a dst PathSpec as the first arg')

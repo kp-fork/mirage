@@ -62,11 +62,7 @@ export function backendPath(config: DatabricksVolumeConfig, path: PathSpec | str
 export function virtualPath(config: DatabricksVolumeConfig, backend: string, prefix = ''): string {
   const root = configuredRoot(config)
   const remotePath = normalizePosix(backend)
-  assertInsideRoot(
-    root,
-    remotePath,
-    `backend path is outside Databricks volume root: ${backend}`,
-  )
+  assertInsideRoot(root, remotePath, `backend path is outside Databricks volume root: ${backend}`)
   const relative = stripSlash(remotePath === root ? '' : remotePath.slice(root.length))
   const path = relative !== '' ? '/' + relative : '/'
   if (prefix !== '' && path !== '/') return rstripSlash(prefix) + path

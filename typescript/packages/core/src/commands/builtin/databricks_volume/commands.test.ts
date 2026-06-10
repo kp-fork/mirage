@@ -61,7 +61,8 @@ async function run(
   const [out, io] = result
   let stdout = ''
   if (out !== null) {
-    const buf = out instanceof Uint8Array ? out : await materialize(out as AsyncIterable<Uint8Array>)
+    const buf =
+      out instanceof Uint8Array ? out : await materialize(out as AsyncIterable<Uint8Array>)
     stdout = DEC.decode(buf)
   }
   return { stdout, exitCode: io.exitCode }
@@ -71,9 +72,30 @@ describe('databricks_volume commands registry', () => {
   it('registers the same 24 commands as Python', () => {
     const names = DATABRICKS_VOLUME_COMMANDS.map((c) => c.name).sort()
     expect(names).toEqual([
-      'awk', 'cat', 'cp', 'cut', 'diff', 'find', 'grep', 'head', 'jq', 'ls',
-      'mkdir', 'mv', 'nl', 'rg', 'rm', 'sed', 'sort', 'stat', 'tail', 'touch',
-      'tr', 'tree', 'uniq', 'wc',
+      'awk',
+      'cat',
+      'cp',
+      'cut',
+      'diff',
+      'find',
+      'grep',
+      'head',
+      'jq',
+      'ls',
+      'mkdir',
+      'mv',
+      'nl',
+      'rg',
+      'rm',
+      'sed',
+      'sort',
+      'stat',
+      'tail',
+      'touch',
+      'tr',
+      'tree',
+      'uniq',
+      'wc',
     ])
   })
 })
@@ -107,7 +129,12 @@ describe('ls', () => {
     })
     vi.stubGlobal('fetch', fetch)
     const { stdout } = await run('ls', [
-      new PathSpec({ original: '/volume/', directory: '/volume/', prefix: '/volume', resolved: false }),
+      new PathSpec({
+        original: '/volume/',
+        directory: '/volume/',
+        prefix: '/volume',
+        resolved: false,
+      }),
     ])
     expect(stdout.split('\n').filter(Boolean)).toEqual(['a', 'b.txt'])
   })

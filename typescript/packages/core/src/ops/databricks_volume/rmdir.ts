@@ -22,7 +22,12 @@ export const rmdirOp: RegisteredOp = {
   resource: ResourceName.DATABRICKS_VOLUME,
   filetype: null,
   write: true,
-  fn: (accessor: DatabricksVolumeAccessor, path: PathSpec, _args: readonly unknown[], kwargs: OpKwargs) => {
+  fn: (
+    accessor: DatabricksVolumeAccessor,
+    path: PathSpec,
+    _args: readonly unknown[],
+    kwargs: OpKwargs,
+  ) => {
     return coreRmdir(accessor, path, kwargs.index)
   },
 }

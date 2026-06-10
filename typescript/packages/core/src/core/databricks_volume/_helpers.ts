@@ -23,9 +23,7 @@ export function ensurePathSpec(path: PathSpec | string): PathSpec {
 export function parentPath(path: PathSpec | string): PathSpec {
   const p = ensurePathSpec(path)
   const stripped = rstripSlash(p.stripPrefix)
-  let parentRelative = stripped.includes('/')
-    ? stripped.slice(0, stripped.lastIndexOf('/'))
-    : '/'
+  let parentRelative = stripped.includes('/') ? stripped.slice(0, stripped.lastIndexOf('/')) : '/'
   if (!parentRelative.startsWith('/')) parentRelative = '/' + parentRelative
   let original: string
   if (p.prefix !== '') {

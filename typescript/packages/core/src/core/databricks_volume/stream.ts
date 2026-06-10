@@ -49,7 +49,7 @@ export async function* readStream(
   if (body === null) return
   const reader = body.getReader()
   let pending: Uint8Array = new Uint8Array(0)
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read()
     if (done) break
     pending = concatChunks(pending, value)

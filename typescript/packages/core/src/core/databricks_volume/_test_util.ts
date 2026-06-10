@@ -50,9 +50,10 @@ export interface FetchCall {
   body: Uint8Array | string | undefined
 }
 
-export function routedFetch(
-  route: (call: FetchCall) => Response | Promise<Response>,
-): { fetch: typeof fetch; calls: FetchCall[] } {
+export function routedFetch(route: (call: FetchCall) => Response | Promise<Response>): {
+  fetch: typeof fetch
+  calls: FetchCall[]
+} {
   const calls: FetchCall[] = []
   const impl = async (input: unknown, init?: RequestInit): Promise<Response> => {
     const call: FetchCall = {

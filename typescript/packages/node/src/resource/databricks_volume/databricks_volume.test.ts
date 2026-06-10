@@ -35,9 +35,7 @@ describe('config normalization', () => {
   })
 
   it('rejects invalid volume parts', () => {
-    expect(() =>
-      normalizeDatabricksVolumeConfig({ ...BASE_CONFIG, catalog: 'a/b' }),
-    ).toThrow()
+    expect(() => normalizeDatabricksVolumeConfig({ ...BASE_CONFIG, catalog: 'a/b' })).toThrow()
   })
 
   it('redacts the token', () => {

@@ -60,9 +60,11 @@ describe('copy', () => {
   it('still raises for a missing source on same-path copy', async () => {
     const { fetch } = routedFetch(() => notFoundResponse())
     vi.stubGlobal('fetch', fetch)
-    const err = (await copy(makeAccessor(), spec('/volume/gone.txt'), spec('/volume/gone.txt')).catch(
-      (e: unknown) => e,
-    )) as Error & { code?: string }
+    const err = (await copy(
+      makeAccessor(),
+      spec('/volume/gone.txt'),
+      spec('/volume/gone.txt'),
+    ).catch((e: unknown) => e)) as Error & { code?: string }
     expect(err.code).toBe('ENOENT')
   })
 
