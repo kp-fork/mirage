@@ -21,7 +21,7 @@ from mirage.commands.builtin.generic.uniq import uniq as generic_uniq
 from mirage.commands.registry import command
 from mirage.commands.spec import SPECS
 from mirage.core.gdrive.glob import resolve_glob
-from mirage.core.gdrive.stream import read_stream
+from mirage.core.gdrive.stream import stream
 from mirage.io.types import ByteSource, IOResult
 from mirage.types import PathSpec
 
@@ -48,14 +48,14 @@ async def uniq(
         paths = []
     return await generic_uniq(
         paths,
-        read_stream=partial(read_stream, index=index),
+        read_stream=partial(stream, index=index),
         accessor=accessor,
         stdin=stdin,
         count=c,
         duplicates_only=d,
         unique_only=u,
-        skip_fields=int(f) if f else 0,
-        skip_chars=int(s) if s else 0,
+        skip_fields=f,
+        skip_chars=s,
         ignore_case=i,
-        check_chars=int(w) if w else 0,
+        check_chars=w,
     )

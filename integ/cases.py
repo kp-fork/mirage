@@ -64,6 +64,8 @@ SEED_FILES = {
     "a,1\nb,2\nc,3\nd,4\ne,5\n",
     "/data/sorted_c.txt":
     "apple\ncherry\nelder\nfig\n",
+    "/data/prefix_dup.txt":
+    "1 apple\n2 apple\n3 banana\n",
 }
 
 CASES: list[tuple[str, str]] = [
@@ -321,6 +323,11 @@ CASES: list[tuple[str, str]] = [
     ("uniq_u", "uniq -u /data/dup.txt"),
     ("uniq_repeats", "uniq /data/repeats.txt"),
     ("uniq_c_repeats", "uniq -c /data/repeats.txt"),
+    ("uniq_f", "uniq -f 1 /data/prefix_dup.txt"),
+    ("uniq_s", "uniq -s 1 /data/prefix_dup.txt"),
+    ("uniq_w", "uniq -w 3 /data/prefix_dup.txt"),
+    ("uniq_w0", "uniq -w 0 /data/prefix_dup.txt"),
+    ("uniq_f_c", "uniq -c -f 1 /data/prefix_dup.txt"),
 
     # ----- grep more -----
     ("grep_F", "grep -F . /data/user.json"),
@@ -426,6 +433,16 @@ CASES: list[tuple[str, str]] = [
     ("mv_multi_into_dir", "mv /data/sub/a.txt /data/sub/b.txt /data/sub/deep"),
     ("mv_multi_verify_a", "cat /data/sub/deep/a.txt"),
     ("mv_multi_verify_b", "cat /data/sub/deep/b.txt"),
+
+    # ----- rg multi-path + columnar skip -----
+    ("rg_multi_setup_d1", "mkdir -p /data/rgm/d1"),
+    ("rg_multi_setup_d2", "mkdir -p /data/rgm/d2"),
+    ("rg_multi_seed1", "cp /data/a.txt /data/rgm/d1/f1.txt"),
+    ("rg_multi_seed2", "cp /data/mixed.txt /data/rgm/d2/f2.txt"),
+    ("rg_multi_dir", "rg -i hello /data/rgm/d1 /data/rgm/d2"),
+    ("rg_l_multi_file", "rg -l hello /data/rgm/d1/f1.txt /data/rgm/d2/f2.txt"),
+    ("rg_col_seed_parquet", "cp /data/a.txt /data/rgm/d1/skip.parquet"),
+    ("rg_columnar_skip", "rg world /data/rgm/d1"),
 ]
 
 EXIT_CODE_CASES: list[tuple[str, str]] = [
