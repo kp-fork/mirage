@@ -18,6 +18,7 @@ import { ResourceName, type PathSpec } from '../../types.ts'
 import { dbxFetch } from './_client.ts'
 import { isNotFound, notFoundError } from './errors.ts'
 import { backendPath } from './path.ts'
+import { readBytes } from './read.ts'
 
 const DEFAULT_CHUNK_SIZE = 8192
 
@@ -63,4 +64,13 @@ export async function* readStream(
     if (rec !== null) rec.bytes += pending.byteLength
     yield pending
   }
+}
+
+export async function rangeRead(
+  accessor: DatabricksVolumeAccessor,
+  path: PathSpec,
+  start: number,
+  end: number,
+): Promise<Uint8Array> {
+  return readBytes(accessor, path, undefined, { offset: start, size: end - start })
 }

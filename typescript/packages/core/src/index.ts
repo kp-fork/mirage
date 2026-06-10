@@ -1198,7 +1198,7 @@ export {
   isNotFound as isDatabricksVolumeNotFound,
 } from './core/databricks_volume/errors.ts'
 export { readBytes as databricksVolumeRead } from './core/databricks_volume/read.ts'
-export { readStream as databricksVolumeReadStream } from './core/databricks_volume/stream.ts'
+export { readStream as databricksVolumeReadStream, rangeRead as databricksVolumeRangeRead } from './core/databricks_volume/stream.ts'
 export { readdir as databricksVolumeReaddir } from './core/databricks_volume/readdir.ts'
 export { stat as databricksVolumeStat } from './core/databricks_volume/stat.ts'
 export { exists as databricksVolumeExists } from './core/databricks_volume/exists.ts'
