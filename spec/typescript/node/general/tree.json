@@ -29,8 +29,7 @@
       "s3",
       "slack",
       "ssh",
-      "trello",
-      "vercel"
+      "trello"
     ]
   },
   "description": null,

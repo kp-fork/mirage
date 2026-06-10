@@ -1084,57 +1084,6 @@ export {
   searchDatabase as mongoSearchDatabase,
   type CollectionMatches as MongoCollectionMatches,
 } from './core/mongodb/search.ts'
-export type {
-  VercelDeployment,
-  VercelDeploymentEvent,
-  VercelDomain,
-  VercelDriver,
-  VercelEnvVar,
-  VercelListOptions,
-  VercelProject,
-  VercelTeam,
-  VercelTeamMember,
-  VercelUser,
-} from './core/vercel/_driver.ts'
-export { VercelAccessor } from './accessor/vercel.ts'
-export {
-  normalizeVercelConfig,
-  resolveVercelConfig,
-  type VercelConfig,
-  type VercelConfigResolved,
-} from './resource/vercel/config.ts'
-export { VERCEL_PROMPT } from './resource/vercel/prompt.ts'
-export { VERCEL_OPS } from './ops/vercel/index.ts'
-export { VERCEL_COMMANDS } from './commands/builtin/vercel/index.ts'
-export { read as vercelRead } from './core/vercel/read.ts'
-export { readdir as vercelReaddir } from './core/vercel/readdir.ts'
-export { stat as vercelStat } from './core/vercel/stat.ts'
-export { resolveGlob as resolveVercelGlob } from './core/vercel/glob.ts'
-export {
-  detectScope as detectVercelScope,
-  type VercelScope,
-  type VercelLevel,
-  ROOT_ENTRIES as VERCEL_ROOT_ENTRIES,
-  TEAM_FILES as VERCEL_TEAM_FILES,
-  PROJECT_FILES as VERCEL_PROJECT_FILES,
-  PROJECT_SUBDIRS as VERCEL_PROJECT_SUBDIRS,
-  DEPLOYMENT_FILES as VERCEL_DEPLOYMENT_FILES,
-} from './core/vercel/scope.ts'
-export {
-  getUser as vercelGetUser,
-  listTeams as vercelListTeams,
-  getTeam as vercelGetTeam,
-  listTeamMembers as vercelListTeamMembers,
-  listProjects as vercelListProjects,
-  getProject as vercelGetProject,
-  listProjectDomains as vercelListProjectDomains,
-  listProjectEnv as vercelListProjectEnv,
-  listProjectDeployments as vercelListProjectDeployments,
-  getDeployment as vercelGetDeployment,
-  listDeploymentEvents as vercelListDeploymentEvents,
-} from './core/vercel/_client.ts'
-export { HttpVercelDriver, type HttpVercelDriverOptions } from './core/vercel/http_driver.ts'
-
 export { setHttpProxyBase } from './commands/builtin/utils/http.ts'
 
 export { lstripSlash, rstripSlash, stripSlash } from './util/slash.ts'

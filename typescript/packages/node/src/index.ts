@@ -88,7 +88,6 @@ export { MongoDBResource, type MongoDBResourceOptions } from './resource/mongodb
 export { MongoDBStore } from './resource/mongodb/store.ts'
 export { LanceDBResource, type LanceDBResourceOptions } from './resource/lancedb/lancedb.ts'
 export { LanceDBStore } from './resource/lancedb/store.ts'
-export { VercelResource, type VercelResourceOptions } from './resource/vercel/vercel.ts'
 export { SlackResource, type SlackResourceState } from './resource/slack/slack.ts'
 export {
   normalizeSlackConfig,

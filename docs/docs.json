@@ -451,8 +451,7 @@
                 "group": "Others",
                 "icon": "ellipsis",
                 "pages": [
-                  "typescript/setup/trello",
-                  "typescript/setup/vercel"
+                  "typescript/setup/trello"
                 ]
               }
             ]

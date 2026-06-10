@@ -26,8 +26,7 @@
       "ram",
       "s3",
       "slack",
-      "trello",
-      "vercel"
+      "trello"
     ]
   },
   "description": null,
