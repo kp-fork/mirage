@@ -19,14 +19,7 @@ import type { NotionStatAccessor } from './stat.ts'
 import { readdir } from './readdir.ts'
 import { stat } from './stat.ts'
 import { stripSlash } from '../../util/slash.ts'
-
-function fnmatch(name: string, pattern: string): boolean {
-  const re = pattern
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\?/g, '.')
-    .replace(/\*/g, '.*')
-  return new RegExp(`^${re}$`).test(name)
-}
+import { fnmatch } from '../../util/fnmatch.ts'
 
 async function collect(
   accessor: NotionStatAccessor,

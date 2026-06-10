@@ -16,6 +16,7 @@ import type { FileStat } from '../../types.ts'
 import { FileType } from '../../types.ts'
 import { getExtension } from '../resolve.ts'
 import { BINARY_EXTENSIONS, compilePattern, grepLines } from './grep_helper.ts'
+import { fnmatch } from '../../util/fnmatch.ts'
 
 export const TYPE_EXTENSIONS: Record<string, string[]> = {
   py: ['.py'],
@@ -53,15 +54,6 @@ export interface RgFilterOptions {
 function basename(path: string): string {
   const i = path.lastIndexOf('/')
   return i === -1 ? path : path.slice(i + 1)
-}
-
-function fnmatch(name: string, pattern: string): boolean {
-  // Convert shell glob to regex
-  const re = pattern
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\?/g, '.')
-    .replace(/\*/g, '.*')
-  return new RegExp(`^${re}$`).test(name)
 }
 
 export function rgMatchesFilter(
